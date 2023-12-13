@@ -6,8 +6,9 @@ use std::{
 };
 
 use crossterm::{
-    terminal,
-    ExecutableCommand, cursor,
+    cursor,
+    terminal::{self},
+    ExecutableCommand,
 };
 
 pub struct Snowfall {
@@ -88,11 +89,15 @@ impl Snowfall {
             self.simulate_frame();
 
             std::thread::sleep(std::time::Duration::from_secs_f32(0.5));
-            
-            stdout.execute(cursor::MoveUp((self.height as u16) + 1)).unwrap();
-            stdout.execute(terminal::Clear(terminal::ClearType::FromCursorDown)).unwrap();
-            let _ = write!(stdout, "{}", self);
 
+            stdout
+                .execute(cursor::MoveUp((self.height as u16) + 1))
+                .unwrap();
+
+            stdout
+                .execute(terminal::Clear(terminal::ClearType::All))
+                .unwrap();
+            let _ = write!(stdout, "{}", self);
 
             if self.done {
                 println!("done");
@@ -110,10 +115,7 @@ impl Display for Snowfall {
             }
             f.write_char('\n')?;
         }
-        let _ = f.write_fmt(format_args!(
-            "step: {}, \n",
-            self.current_iteration
-        ));
+        let _ = f.write_fmt(format_args!("step: {}, \n", self.current_iteration));
 
         Ok(())
     }
